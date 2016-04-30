@@ -4,6 +4,7 @@ __author__ = 'Sid'
 from lxml import html
 from selenium import webdriver
 from time import sleep
+import constants
 
 class SeatOptions(object):
     """
@@ -36,50 +37,23 @@ def parse_option(options, selection_category):
     selected_index = int(selected_index)
     return options[selected_index].attrib['value']  # Return value of choosen option
 
-def select_cinema(page_source):
+def select_item(driver, item_options):
     """
-    :param page_source: string page source
-    :return: The cinema's code
+    :param driver: WebDriver to navigate in
+    :param item_options: Tuple of relevant xpath and descriptor
+    :return: the item's code
     """
 
-    html_tree = html.fromstring(page_source)
-    cinemas_xpath = '//select[@class="scheduleDropBox_subSite"]/option'
-    cinemas_elements = html_tree.xpath(cinemas_xpath)
-    cinema = parse_option(cinemas_elements, 'cinema')
-    return cinema
+    xpath, descriptor = item_options
+    html_tree = html.fromstring(driver.page_source)
+    item_elements = html_tree.xpath(xpath)
+    item = parse_option(item_elements, descriptor)
 
-def select_movie(page_source):
-    """
-    :param page_source: string page source
-    :return: The movie's code
-    """
-    html_tree = html.fromstring(page_source)
-    movies_xpath = '//select[@class="scheduleDropBox_feature"]/option'
-    movies_elements = html_tree.xpath(movies_xpath)
-    movie = parse_option(movies_elements, 'movie')
-    return movie
+    # Set the item
+    item_xpath = "{generic}[@value='{code}']".format(generic=xpath, code=item)
+    driver.find_element_by_xpath(item_xpath).click()
 
-def select_date(page_source):
-    """
-    :param page_source: string page source
-    :return: The date's code
-    """
-    html_tree = html.fromstring(page_source)
-    hours_xpath = '//select[@class="scheduleDropBox_date"]/option'
-    hours_elements = html_tree.xpath(hours_xpath)
-    hour = parse_option(hours_elements, 'hour')
-    return hour
-
-def select_time(page_source):
-    """
-    :param page_source: string page source
-    :return: The time's code
-    """
-    html_tree = html.fromstring(page_source)
-    times_xpath = '//select[@class="scheduleDropBox_time"]/option'
-    times_elements = html_tree.xpath(times_xpath)
-    time = parse_option(times_elements, 'time')
-    return time
+    return item
 
 def select_options(driver):
     """
@@ -88,18 +62,18 @@ def select_options(driver):
     """
 
     # Sleep between each select so that it can load the following combobox
-    cinema = select_cinema(driver.page_source)
-    sleep(1)
-    movie = select_movie(driver.page_source)
-    sleep(1)
-    date = select_date(driver.page_source)
-    sleep(1)
-    time = select_time(driver.page_source)
+    cinema = select_item(driver, constants.MenuXpaths.cinemas)
+    sleep(constants.SELECTION_WAIT)
+    movie = select_item(driver, constants.MenuXpaths.movies)
+    sleep(constants.SELECTION_WAIT)
+    date = select_item(driver, constants.MenuXpaths.dates)
+    sleep(constants.SELECTION_WAIT)
+    time = select_item(driver, constants.MenuXpaths.times)
 
     return SeatOptions(cinema, movie, date, time)
 
 
-def main():
+def main():z
     """
     :return: Starts the whole program to save seats in cinema city
     """
