@@ -5,7 +5,8 @@ from lxml import html
 from selenium import webdriver
 from time import sleep
 import constants
-from datetime import datetime
+from datetime import datetime, timedelta
+import re
 
 
 class SeatOptions(object):
@@ -30,23 +31,19 @@ class SeatOptions(object):
         """
 
         # Setting cinema
-        cinema_xpath = "{generic}[@value='{code}']".format(generic = constants.MenuXpaths.cinemas[0], code=self.cinema_code)
-        driver.find_element_by_xpath(cinema_xpath).click()
+        set_option(driver, constants.MenuXpaths.cinemas[0], self.cinema_code)
         sleep(constants.SELECTION_WAIT)
 
         # Setting movie
-        movie_xpath = "{generic}[@value='{code}']".format(generic = constants.MenuXpaths.movies[0], code=self.movie_code)
-        driver.find_element_by_xpath(movie_xpath).click()
+        set_option(driver, constants.MenuXpaths.movies[0], self.movie_code)
         sleep(constants.SELECTION_WAIT)
 
         # Setting date
-        date_xpath = "{generic}[@value='{code}']".format(generic = constants.MenuXpaths.dates[0], code=self.date_code)
-        driver.find_element_by_xpath(date_xpath).click()
+        set_option(driver, constants.MenuXpaths.dates[0], self.date_code)
         sleep(constants.SELECTION_WAIT)
 
         # Setting time
-        time_xpath = "{generic}[@value='{code}']".format(generic = constants.MenuXpaths.times[0], code=self.time_code)
-        driver.find_element_by_xpath(time_xpath).click()
+        set_option(driver, constants.MenuXpaths.times[0], self.time_code)
 
         driver.find_element_by_xpath(constants.MenuXpaths.submit[0]).click()  # Submit
 
@@ -144,6 +141,16 @@ def get_people_amount():
         people = raw_input("Enter amount of people to save seats for (between 1 and 9): ")
     return int(people)
 
+def combine_to_datetime(date, time):
+    """
+    :param date: Date + dayname in hebrew
+    :param time: Time
+    :return: datetime
+    """
+    date_string = re.sub( r'[^\d/]', '', date)
+    string_datetime = "{0} {1}".format(date_string, time)
+    return datetime.strptime(string_datetime, '%d/%m/%Y %H:%M')
+
 
 def main():
     """
@@ -157,12 +164,12 @@ def main():
     release_time = get_seat_release_time()
     people_amount = get_people_amount()
 
-    string_datetime = "{0} {1}".format(movie_info.date_value, movie_info.time_value)
-    movie_datetime = datetime.strptime(string_datetime, '%d/%m/&Y &H:%M')
+    movie_datetime = combine_to_datetime(movie_info.date_value, movie_info.time_value)
 
     # Rechoose seats until we passed the release time
-    while datetime.now() < movie_datetime - release_time:
+    while datetime.now() < movie_datetime - timedelta(minutes=release_time):
         movie_info.set(driver)
+        sleep(constants.SELECTION_WAIT)
         driver.switch_to.window(driver.window_handles[1])
         if 'ddlTicketQuantity' in driver.page_source:
             driver.find_element_by_xpath('//select[@class="ddlTicketQuantity"][1]/option[@value="{0}"]'
