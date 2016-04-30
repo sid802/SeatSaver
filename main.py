@@ -5,16 +5,50 @@ from lxml import html
 from selenium import webdriver
 from time import sleep
 import constants
+from datetime import datetime
 
 class SeatOptions(object):
     """
     Class to easily save the seat's info
     """
-    def __init__(self, cinema, movie, date, hour):
+    def __init__(self, cinema, movie, date, time):
         self.cinema = cinema
         self.movie = movie
         self.date = date
-        self.hour = hour
+        self.time = time
+
+    def set(self, driver):
+        """
+        :param driver: WebDriver open on home page where the options will be set
+        """
+
+        # Setting cinema
+        driver.find_element_by_xpath(constants.MenuXpaths.cinemas[0]).click()
+        sleep(constants.SELECTION_WAIT)
+
+        # Setting movie
+        driver.find_element_by_xpath(constants.MenuXpaths.movies[0]).click()
+        sleep(constants.SELECTION_WAIT)
+
+        # Setting date
+        driver.find_element_by_xpath(constants.MenuXpaths.dates[0]).click()
+        sleep(constants.SELECTION_WAIT)
+
+        # Setting time
+        driver.find_element_by_xpath(constants.MenuXpaths.times[0]).click()
+
+        driver.find_element_by_xpath(constants.MenuXpaths.submit[0]).click()  # Submit
+
+def set_option(driver, generic_xpath, item_code):
+    """
+    :param driver: WebDriver open on home page where the options will be se
+    :param generic_xpath: xpath to all the possible options
+    :param item_code: the way to pick the correct option
+    """
+
+    # Set the item
+    item_xpath = "{generic}[@value='{code}']".format(generic=generic_xpath, code=item_code)
+    driver.find_element_by_xpath(item_xpath).click()
 
 def parse_option(options, selection_category):
     """
@@ -49,9 +83,7 @@ def select_item(driver, item_options):
     item_elements = html_tree.xpath(xpath)
     item = parse_option(item_elements, descriptor)
 
-    # Set the item
-    item_xpath = "{generic}[@value='{code}']".format(generic=xpath, code=item)
-    driver.find_element_by_xpath(item_xpath).click()
+    set_option(driver, xpath, item)
 
     return item
 
@@ -72,6 +104,25 @@ def select_options(driver):
 
     return SeatOptions(cinema, movie, date, time)
 
+def get_seat_release_time():
+    """
+    :return: howmuch time to release the seats before the movie starts
+    """
+
+    release_time = raw_input("----------\nEnter amount of time (in minutes) you want to release the seats before the movie starts: ")
+    while not release_time.isdigit():
+        release_time = raw_input("Enter amount of time (in minutes) you want to release the seats before the movie starts: ")
+    return int (release_time)
+
+def get_people_amount():
+    """
+    :return: howmany people to keep seats for
+    """
+
+    people = raw_input("----------\nEnter amount of people to save seats for: ")
+    while not release_time.isdigit():
+        people = raw_input("Enter amount of people to save seats for: ")
+    return int (release_time)
 
 def main():
     """
@@ -82,6 +133,19 @@ def main():
     driver.get(r'http://www.cinema-city.co.il')
 
     movie_info = select_options(driver)
+    release_time = get_seat_release_time()
+    people_amount = get_people_amount()
+    
+    string_datetime = "{0} {1}".format(movie_info.date, movie_info.time)
+    movie_datetime = datetime.strptime(string_datetime, '%d/%m/&Y &H:%M')
+
+    # Rechoose seats until we passed the release time
+    while datetime.now() < movie_datetime - release_time:
+        movie_info.set(driver)
+
+
+
+    return movie_info
 
 if __name__ == '__main__':
     main()

@@ -9,3 +9,4 @@ class MenuXpaths(object):
     movies = ('//select[@class="scheduleDropBox_feature"]/option', 'movie')
     dates = ('//select[@class="scheduleDropBox_date"]/option', 'date')
     times = ('//select[@class="scheduleDropBox_time"]/option', 'time')
+    submit = ('//input[@class="scheduleDropBox_submit"]', 'submit')
