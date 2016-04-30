@@ -73,7 +73,7 @@ def select_options(driver):
     return SeatOptions(cinema, movie, date, time)
 
 
-def main():z
+def main():
     """
     :return: Starts the whole program to save seats in cinema city
     """
