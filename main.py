@@ -27,7 +27,8 @@ def main():
 
     # Rechoose seats until we passed the release time
     while datetime.now() < movie_datetime - timedelta(minutes=release_time):
-        movie_info.set(driver)
+        driver.get(r'http://www.cinema-city.co.il')
+        movie_info.set_options(driver)
         sleep(constants.SELECTION_WAIT)
         driver.switch_to.window(driver.window_handles[1])
         if 'ddlTicketQuantity' in driver.page_source:
@@ -35,7 +36,16 @@ def main():
                                          .format(people_amount)).click()
         if first_iter:
             print "Pick your seats in the browser"
+            movie_info.get_seats(driver)
             first_iter = False
+        else:
+            movie_info.set_seats(driver)
+
+        driver.find_element_by_xpath(constants.MenuXpaths.submit_seats).click()
+
+        sleep(constants.SELECTION_WAIT)
+        driver.close()
+        driver.switch_to.window(driver.window_handles[0])
 
 
     return movie_info

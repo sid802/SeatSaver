@@ -24,10 +24,12 @@ class SeatOptions(object):
         self.date_value = date_value
         self.time_code = time_code
         self.time_value = time_value
+        self.seat_ids = None  # Will be initialized later
 
-    def set(self, driver):
+    def set_options(self, driver):
         """
         :param driver: WebDriver open on home page where the options will be set
+        The function fills the options in the home screen
         """
 
         # Setting cinema
@@ -46,6 +48,28 @@ class SeatOptions(object):
         set_option(driver, constants.MenuXpaths.times[0], self.time_code)
 
         driver.find_element_by_xpath(constants.MenuXpaths.submit[0]).click()  # Submit
+
+    def set_seats(self, driver):
+        """
+        :param driver: WebDriver open on home page where the options will be set
+        The function fills the seats in
+        """
+
+        for seat_id in self.seat_ids:
+            current_xpath = '//div[@id="{0}"]'.format(seat_id)
+            driver.find_element_by_xpath(current_xpath).click()  # Finds element and selects it
+
+    def get_seats(self, driver):
+        """
+        :param driver: WebDriver open on home page where the options will be set
+        :return: Saves the choosen seats (and returns them)
+        """
+
+        tree = html.fromstring(driver.page_source)
+        chosen_seats = tree.xpath(constants.MenuXpaths.taken_seats)  # Returns the id's of the chosen seats
+        self.seat_ids = chosen_seats
+        return chosen_seats
+
 
 def retry(func):
     """
