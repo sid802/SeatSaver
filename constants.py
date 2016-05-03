@@ -2,6 +2,7 @@ __author__ = 'Sid'
 #-*- encoding: utf-8 -*-
 
 SELECTION_WAIT = 1  # in seconds
+RETRY_TIME = 1.5 # in seconds
 
 class MenuXpaths(object):
     # Contains tuples of the proper xpath and a descriptor
