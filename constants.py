@@ -13,5 +13,7 @@ class MenuXpaths(object):
     submit = ('//input[@class="scheduleDropBox_submit"]', 'submit')
     taken_seats = ('//div[contains(@style,"SeatStatus=3")]/@id', 'seats')
     submit_seats = ('//a[contains(@id,"lnkSubmit")][1]', 'submit seats')
-    submit_popcorn = ('//input[@src="Assets/Images/NLC/NextButton.jpg"]', 'submit popcorn')
+    submit_seat_amount = ('//input[@id="ctl00_CPH1_imgNext1"]', 'submit seat amount')
+    submit_popcorn = ('//input[@id="Assets/Images/NLC/NextButton.jpg"]', 'submit popcorn')
+
     
