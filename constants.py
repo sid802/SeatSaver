@@ -2,6 +2,7 @@ __author__ = 'Sid'
 #-*- encoding: utf-8 -*-
 
 SELECTION_WAIT = 1  # in seconds
+REORDER_WAIT = 7 * 60  # In seconds
 RETRY_TIME = 1.5 # in seconds
 
 class MenuXpaths(object):

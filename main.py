@@ -35,7 +35,7 @@ def main():
         if 'ddlTicketQuantity' in driver.page_source:
             driver.find_element_by_xpath('//select[@class="ddlTicketQuantity"][1]/option[@value="{0}"]'
                                          .format(people_amount)).click()
-            driver.find_element_by_xpath(constants.MenuXpaths.submit_seat_amount).click()
+            driver.find_element_by_xpath(constants.MenuXpaths.submit_seat_amount[0]).click()
 
         if first_iter:
             print "Pick your seats in the browser"
@@ -44,11 +44,12 @@ def main():
         else:
             movie_info.set_seats(driver)
 
-        driver.find_element_by_xpath(constants.MenuXpaths.submit_seats).click()
+        driver.find_element_by_xpath(constants.MenuXpaths.submit_seats[0]).click()
 
         sleep(constants.SELECTION_WAIT)
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
+        sleep(constants.REORDER_WAIT)
 
 
     return movie_info

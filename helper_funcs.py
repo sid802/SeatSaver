@@ -64,9 +64,9 @@ class SeatOptions(object):
         :param driver: WebDriver open on home page where the options will be set
         :return: Saves the choosen seats (and returns them)
         """
-
+        raw_input('Press Enter when done choosing seats')
         tree = html.fromstring(driver.page_source)
-        chosen_seats = tree.xpath(constants.MenuXpaths.taken_seats)  # Returns the id's of the chosen seats
+        chosen_seats = tree.xpath(constants.MenuXpaths.taken_seats[0])  # Returns the id's of the chosen seats
         self.seat_ids = chosen_seats
         return chosen_seats
 
@@ -94,7 +94,7 @@ def set_option(driver, generic_xpath, item_code):
     """
 
     # Set the item
-    item_xpath = "{generic}[@value='{code}']".format(generic=generic_xpath, code=item_code)
+    item_xpath = '{generic}[@value="{code}"]'.format(generic=generic_xpath, code=item_code)
     driver.find_element_by_xpath(item_xpath).click()
 
 
